@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>잇템 - 내 기준으로 보는 잇템 확률</title>
+<meta name="description" content="성분표, 소재, 사이즈를 내 기준으로 읽고 '내 잇템일 확률'을 알려주는 앱 잇템을 소개합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Gothic+A1:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #D6114F;
+    --pink-soft: #FDE6EE;
+    --yellow: #FFD400;
+    --yellow-soft: #FFF6CC;
+    --ink: #241F2B;
+    --ink-2: #5E5866;
+    --ink-3: #8E8896;
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --line: #EFECF2;
+    --shadow: 0 18px 40px -18px rgba(214, 17, 79, .28), 0 6px 18px -10px rgba(36, 31, 43, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --pink-soft: #3A1624;
+      --yellow-soft: #3A3313;
+      --ink: #F6F3F8;
+      --ink-2: #CFC9D6;
+      --ink-3: #A39CAD;
+      --bg: #17141B;
+      --surface: #221E27;
+      --line: #332E39;
+      --shadow: 0 18px 40px -18px rgba(0, 0, 0, .6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --pink-soft: #3A1624;
+    --yellow-soft: #3A3313;
+    --ink: #F6F3F8;
+    --ink-2: #CFC9D6;
+    --ink-3: #A39CAD;
+    --bg: #17141B;
+    --surface: #221E27;
+    --line: #332E39;
+    --shadow: 0 18px 40px -18px rgba(0, 0, 0, .6);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Gothic A1", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+  .num, .logo { font-family: "Fredoka", "Gothic A1", sans-serif; }
+
+  header.hero {
+    background: var(--pink);
+    color: #fff;
+    border-radius: 0 0 36px 36px;
+    padding: 28px 0 64px;
+    overflow: hidden;
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 28px; font-weight: 700; letter-spacing: -.5px; }
+  .badge {
+    background: var(--yellow); color: #241F2B; font-weight: 800; font-size: 13px;
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center; margin-top: 48px; }
+  .hero h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.25; margin: 0 0 16px; font-weight: 800; letter-spacing: -1px; }
+  .hero p { font-size: 17px; margin: 0; opacity: .92; }
+  .score-card {
+    background: #fff; color: #241F2B; border-radius: 28px; padding: 24px;
+    box-shadow: 0 24px 50px -20px rgba(0,0,0,.35);
+  }
+  .score-card .label { font-size: 14px; color: #5E5866; font-weight: 700; }
+  .score-card .big { font-size: 76px; font-weight: 700; color: var(--pink); line-height: 1; margin: 8px 0; }
+  .score-card .big small { font-size: 34px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--yellow); color: #241F2B; }
+  .reasons { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+  .reasons li { background: #FDE6EE; border-radius: 14px; padding: 10px 12px; font-size: 14px; font-weight: 600; color: #241F2B; }
+
+  section { padding: 56px 0 8px; }
+  h2 { font-size: 26px; margin: 0 0 8px; letter-spacing: -.5px; }
+  .lead { color: var(--ink-2); margin: 0 0 24px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card {
+    background: var(--surface); border-radius: 24px; padding: 22px; box-shadow: var(--shadow);
+  }
+  .card .ico {
+    width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center;
+    background: var(--pink-soft); color: var(--pink); font-weight: 800; font-size: 20px; margin-bottom: 12px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  .steps { counter-reset: s; display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+  .steps li {
+    counter-increment: s; display: flex; gap: 14px; align-items: flex-start;
+    background: var(--surface); border-radius: 20px; padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .steps li::before {
+    content: counter(s); font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 18px;
+    flex: 0 0 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--yellow); color: #241F2B;
+  }
+  .steps b { display: block; }
+  .steps span { color: var(--ink-2); font-size: 15px; }
+
+  .note {
+    background: var(--yellow-soft); border-radius: 20px; padding: 18px 20px; color: var(--ink);
+    font-size: 15px;
+  }
+  .note + .note { margin-top: 12px; }
+  footer { padding: 48px 0 40px; color: var(--ink-3); font-size: 14px; }
+  footer a { color: var(--pink); font-weight: 700; text-decoration: none; }
+  footer .row { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 20px; }
+
+  @media (max-width: 760px) {
+    .hero-grid { grid-template-columns: 1fr; margin-top: 32px; }
+    .cards { grid-template-columns: 1fr; }
+    header.hero { padding-bottom: 44px; border-radius: 0 0 28px 28px; }
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="nav">
+      <div class="logo">ittem</div>
+      <div class="badge">출시 준비 중</div>
+    </div>
+    <div class="hero-grid">
+      <div>
+        <h1>이거, 나한테 맞을까?<br>잇템이 확률로 알려드려요</h1>
+        <p>화장품 성분표, 옷 소재와 사이즈, 식품 원재료를 사진이나 링크로 보내면 내가 정한 기준으로 읽고 '내 잇템일 확률'을 보여줍니다.</p>
+      </div>
+      <div class="score-card" aria-label="잇템 결과 예시">
+        <div class="label">세라마이드 수분 크림 100ml</div>
+        <div class="big num">87<small>%</small></div>
+        <span class="pill">나에게 맞는 잇템일 확률</span>
+        <ul class="reasons">
+          <li>피하는 향료 성분이 없어요</li>
+          <li>건성에 필요한 보습 성분이 있어요</li>
+          <li>고른 피부 고민에 맞춰 찾는 성분이 있어요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2>잇템이 하는 일</h2>
+    <p class="lead">광고 문구 대신 표기 정보를 읽고, 내 기준과 얼마나 맞는지 숫자로 보여줘요.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="ico">✓</div>
+        <h3>내 기준 만들기</h3>
+        <p>피부 타입과 고민, 피하고 싶은 성분, 불편한 소재, 상의 사이즈, 식품 알레르기를 골라 두세요. 글로 적으면 잇템이 골라 드려요.</p>
+      </div>
+      <div class="card">
+        <div class="ico num">%</div>
+        <h3>확률로 판단</h3>
+        <p>캡처나 링크를 보내면 성분표와 소재 표기를 읽고 '내 잇템일 확률'과 그렇게 본 이유를 함께 보여줘요.</p>
+      </div>
+      <div class="card">
+        <div class="ico">?</div>
+        <h3>모르면 보류</h3>
+        <p>확신이 75% 아래면 억지로 숫자를 내지 않고 보류로 알려드려요. 표기가 부족한 상품도 솔직하게 말해요.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>이렇게 써요</h2>
+    <p class="lead">세 단계면 충분해요.</p>
+    <ol class="steps">
+      <li><div><b>기준 고르기</b><span>처음 한 번, 나에게 중요한 조건을 골라요. 나중에 언제든 바꿀 수 있어요.</span></div></li>
+      <li><div><b>캡처나 링크 보내기</b><span>상품 상세 화면을 캡처하거나 상품 링크를 붙여 넣어요.</span></div></li>
+      <li><div><b>확률과 이유 확인</b><span>내 잇템일 확률, 맞는 점과 걸리는 점을 한눈에 보고 기록에 남겨요.</span></div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>내 잇템 추천</h2>
+    <p class="lead">관심 있는 범주를 고르면, 내 기준으로 확률이 높게 나온 상품을 골라 보여드려요.</p>
+    <div class="note">추천 상품도 판정과 같은 기준으로 계산해요. 수수료 때문에 순서나 확률이 바뀌지 않아요.</div>
+    <div class="note">이 사이트와 잇템 앱의 일부 상품 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
+  </section>
+
+  <section>
+    <h2>알아 두세요</h2>
+    <p class="lead">잇템의 결과는 표기 정보를 바탕으로 한 참고용 확률이에요. 의학적 판단이 아니며, 알레르기나 피부 질환이 있다면 제품 표시사항과 전문가 의견을 꼭 확인해 주세요.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="row">
+    <span><span class="logo">ittem</span> 잇템 · 출시 준비 중</span>
+    <span>문의 <a href="mailto:najo7609@gmail.com">najo7609@gmail.com</a></span>
+  </div>
+</footer>
+</body>
+</html>
